@@ -45,9 +45,9 @@ PERFIL = 'lai'          # @izabelalaila — medido em /postador/fila
 CONTA = '@izabelalaila'
 
 CATS = [
-    ('enigma',   1, 'O enigma',           'Diz que vem coisa e não diz o quê. Só pede uma palavra.'),
+    ('teaser',   1, 'O enigma',           'Diz que vem coisa e não diz o quê. Só pede uma palavra.'),
     ('dor',      2, 'A dor com nome',     'Para de falar de você. Nomeia o problema de quem assiste.'),
-    ('entrega',  3, 'A entrega de graça', 'Dá pronto o menor pedaço útil. Quem pega, levanta a mão.'),
+    ('amostra',  3, 'A entrega de graça', 'Dá pronto o menor pedaço útil. Quem pega, levanta a mão.'),
     ('evento',   4, 'O ao vivo',          'Tira a audiência do feed e põe num lugar onde ela senta.'),
     ('venda',    5, 'O carrinho aberto',  'Oferta nomeada, prazo curto, cupom por comentário.'),
 ]
@@ -119,10 +119,14 @@ def bloco(p, idx_na_cat):
 
 
 FAIXAS = ''
+_vistos = 0
 for chave, n, nome, oque in CATS:
     ps = [p for p in POSTS if p['cat'] == chave]
-    if not ps:
-        continue
+    # ⚠️ categoria vazia é ERRO, não «pula». Foi assim que 20 posts sumiram
+    #    da tela sem ninguém ver: o filtro não achava a chave e seguia reto.
+    assert ps, f'categoria "{chave}" não casou com nenhum post — chaves no JSON: ' \
+               + str(sorted({p["cat"] for p in POSTS}))
+    _vistos += len(ps)
     pede = sum(1 for p in ps if p['pede'])
     FAIXAS += (
         f'<section class="fx" id="fx-{chave}">'
@@ -516,6 +520,7 @@ HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 {CARD}
 <script>{JS}</script></body></html>"""
 
+assert _vistos == len(POSTS), f'{len(POSTS) - _vistos} posts ficaram de fora das categorias'
 saida = os.path.join(DIR, 'index.html')
 open(saida, 'w').write(HTML)
 print(f'✅ {saida}  ({len(HTML.encode()) / 1e6:.2f} MB · {len(POSTS)} posts · {len(POSTS) * 3} ideias)')
