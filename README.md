@@ -45,11 +45,33 @@ custou 18 cartões corrigidos no caixa.
 | a dor («a cliente vem uma vez e some») | **hipótese** — trocar a dor não muda a estrutura, muda as 153 ideias |
 | as palavras-chave | rascunho — nenhuma vai pro ar sem funil que mede |
 
+## As 3 ofertas (ofertas.html)
+
+**https://lavoutaliso-code.github.io/lancamento/ofertas.html**
+
+Três ofertas pra escolher, cada uma com a dor na voz do público, o mecanismo,
+a isca e **o risco**. As três calculadoras **funcionam na página** — ela mexe
+nos números do salão e vê o que cada isca cospe.
+
+Base: **296 posts** e **398 comentários** colhidos da @izabelalaila em
+24/10/2026. Cada evidência citada tem data e contagem.
+
+⚠️ As calculadoras **não projetam venda**. Fazem a aritmética do que já existe
+(preço, custo, tempo, quantidade), porque «quantas clientes novas você vai ter»
+não é conta, é chute.
+
+⚠️ Em 29/12/2025 ela anunciou o encerramento de todos os cursos «em respeito
+aos novos franqueados». Voltar a vender precisa de uma virada honesta — a
+oferta 2 (formação de técnica) é a que mais esbarra nisso.
+
 ## Arquivos
 
 - `index.html` — o site (autocontido, capas embutidas)
 - `gera-site.py` — monta o HTML
 - `ideias51.py` — as 153 ideias de adaptação
 - `posts-lancamento.json` — os 51 posts colhidos
+- `ofertas.html` + `gera-ofertas.py` — as 3 ofertas com calculadora
+- `dossie-izabelalaila.json` — 296 posts dela
+- `comentarios-izabela.json` — 398 comentários lidos
 
 Gerar de novo: `python3 gera-site.py`
