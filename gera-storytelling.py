@@ -25,8 +25,10 @@ def bloco(h):
             f'<p class="at-q"><b>por quê:</b> {esc(porque)}</p></div></div></div>')
     jg = ''.join(f'<li><q>{esc(t)}</q><small>{esc(u)}</small></li>' for t, u in h['jargoes'])
     return (
-        f'<section class="hi" id="h{h["id"]}" style="--acc:{h["acc"]};--cab:{h["cor"]}">'
-        f'<header class="hi-cab"><span class="hi-id">OPÇÃO {h["id"]}</span>'
+        f'<section class="hi{" apv" if h["id"] == "A" else ""}" id="h{h["id"]}" '
+        f'style="--acc:{h["acc"]};--cab:{h["cor"]}">'
+        f'<header class="hi-cab"><span class="hi-id">OPÇÃO {h["id"]}'
+        + ('  ·  ✅ APROVADA' if h['id'] == 'A' else '') + '</span>'
         f'<h2>{esc(h["nome"])}</h2><p class="hi-sub">{esc(h["sub"])}</p>'
         f'<p class="hi-log">{esc(h["log"])}</p></header>'
         f'<div class="hi-ft">'
@@ -64,6 +66,9 @@ h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.034em;line-he
 
 .hi{margin-top:46px;border:1px solid var(--linha);border-radius:22px;overflow:hidden;
  background:var(--sup)}
+.hi.apv{border:2px solid var(--acc);box-shadow:0 0 0 5px rgba(255,45,135,.09)}
+.hi:not(.apv){opacity:.62}
+.hi:not(.apv):hover{opacity:1}
 .hi-cab{background:var(--cab);padding:26px 28px 24px;border-bottom:3px solid var(--acc)}
 .hi-id{font-size:10.5px;font-weight:800;letter-spacing:2px;color:var(--acc)}
 .hi-cab h2{font-size:clamp(25px,4vw,36px);font-weight:800;letter-spacing:-.03em;
@@ -133,6 +138,8 @@ HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <div class="w">
  <span class="selo">ESCOLHER ANTES DAS COPIES</span>
  <h1>Que história a gente vai contar?</h1>
+ <p class="int" style="color:var(--txt);font-weight:600;margin-bottom:9px">
+  ✅ Escolhida: <b>A OPERAÇÃO</b> — as 153 copies já foram reescritas dentro dela.</p>
  <p class="int">Três opções. Não são três versões da mesma — em cada uma muda
   <b>quem é o protagonista</b> (o time · você · a cliente), muda <b>o tempo</b>
   (presente · passado · futuro) e muda <b>o que prende a audiência</b> por 19 dias.

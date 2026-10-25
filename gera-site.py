@@ -620,8 +620,8 @@ HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
  <h1>OPERAÇÃO FIM DE ANO — a estrutura</h1>
  <p>Os <b>{len(POSTS)} posts</b> da @mariaeduardasv de 05/10 a 23/10, na ordem,
   dentro das 5 categorias ({n_pede} pedem alguma coisa, {len(POSTS) - n_pede} não pedem nada).
-  Cada um é uma ramificação <b>① a referência dela → ②②② três copies nossas → ③ o meu post</b> —
-  já escritas para a <b>Operação Fim de Ano</b>, no seu tom.
+  Cada um é uma ramificação <b>① a referência dela → ②②② três copies nossas → ③ o meu post</b>,
+  escritas dentro da história <b>A OPERAÇÃO</b> e na voz medida da @lara.martinelle.
   Clicar no <b>+</b> agenda o post de verdade no {CONTA}.
   <a href="storytelling.html" style="color:var(--rosa);font-weight:700">escolher a história ↗</a>
   <a href="oferta.html" style="color:var(--rosa);font-weight:700">a oferta e os jargões ↗</a></p>
@@ -630,8 +630,11 @@ HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <div class="wrap">
 {FAIXAS}
  <p class="nt">⚠️ <b>A dor é hipótese</b> («a cliente vem uma vez e some»). As
-  {len(POSTS) * 3} copies estão escritas para a <b>Operação Fim de Ano</b>, no tom medido
-  em 165 legendas suas. Toda palavra-chave precisa nascer ligada a um funil que mede.</p>
+  {len(POSTS) * 3} copies seguem a régua medida do lançamento dela — <b>mediana de 250
+  caracteres</b> (dela: 249) e <b>53% com pergunta</b> (dela: 47%) — e os mesmos
+  <b>{len(POSTS) - n_pede} posts de alcance puro</b>, sem palavra nenhuma.
+  As 6 palavras (OPERAÇÃO · SOZINHA · DOSSIÊ · A CONTA · BRIEFING · EU ENTRO) precisam
+  nascer ligadas a um funil que mede.</p>
 </div>
 {CARD}
 {GAVETA}
