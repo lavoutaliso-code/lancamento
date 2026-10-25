@@ -98,10 +98,9 @@ def bloco(p, idx_na_cat):
         + f'</div><div class="op-tx"><p>'
         + txt.replace('<br><br>', '</p><p>')
         + f'</p></div>'
-        f'<div class="op-pe">'
-        f'<button class="op-use" data-mo="{sid}" data-op="{j}">usar esta</button>'
-        f'<button class="op-cp" data-op-txt="{j}" data-mo="{sid}">copiar</button>'
-        f'</div></div>'
+        f'<div class="op-dica">Enter salva · Shift+Enter quebra linha · Esc cancela</div>'
+        f'<button class="op-mex" title="voltar ao texto original">↺ original</button>'
+        f'</div>'
         for j, (ang, kw, txt) in enumerate(p['copies'], 1))
     kw = (f'<span class="rf-kw">pede «{esc(p["pedido"])}»</span>'
           if p.get('pedido') else '<span class="rf-kw rf-kw0">não pede nada</span>')
@@ -216,8 +215,8 @@ svg.fios{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .rf-leg{font-size:11px;color:var(--txt2);margin-top:4px}
 
 .opz{display:flex;flex-direction:column;gap:13px;width:372px}
-.op{background:var(--sup);border:1.6px solid var(--linha);border-radius:13px;padding:11px 13px}
-.op.on{border-color:var(--ok);box-shadow:0 0 0 2px rgba(31,122,76,.15)}
+.op{position:relative;background:var(--sup);border:1.6px solid var(--linha);
+ border-radius:13px;padding:11px 13px}
 .op-l1{display:flex;align-items:flex-start;gap:7px}
 .op-n{font-size:10px;font-weight:800;color:#fff;background:var(--txt);border-radius:5px;
  padding:1px 6px;flex:none;margin-top:1px}
@@ -237,16 +236,21 @@ svg.fios{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .op-tx p+p{margin-top:5px}
 .op-tx b{color:var(--txt);font-weight:700}
 .op-tx i{color:var(--txt2);font-style:italic;opacity:.85}
-.op-pe{display:flex;gap:6px;margin-top:8px}
-.op-pe button{font:inherit;font-size:9.5px;font-weight:700;padding:2px 8px;cursor:pointer;
- border:1.3px solid var(--linha);border-radius:6px;background:transparent;color:var(--txt2)}
-.op-pe button:hover{border-color:var(--txt2)}
-.op-pe button{font:inherit;font-size:10.5px;font-weight:700;padding:4px 10px;cursor:pointer;
- border:1.5px solid var(--linha);border-radius:7px;background:transparent;color:var(--txt2)}
-.op-use{font:inherit;font-size:10.5px;font-weight:700;padding:4px 10px;margin-top:8px;
- cursor:pointer;border:1.5px solid var(--linha);border-radius:7px;background:transparent;
- color:var(--txt2)}
-.op.on .op-use{background:var(--ok);color:#fff;border-color:var(--ok)}
+/* ══ o cartão é folha de escrever: clica e edita, Enter salva ══════════ */
+.op{cursor:text}
+.op:hover{border-color:#CFC8D0}
+.op.ed{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,122,255,.13);cursor:auto}
+.op [contenteditable]{outline:none}
+.op [contenteditable]:focus{background:rgba(0,122,255,.05);border-radius:5px}
+.op-dica{display:none;font-size:9px;color:var(--txt2);margin-top:8px;letter-spacing:.2px}
+.op.ed .op-dica{display:block}
+.op-mex{display:none;position:absolute;top:9px;right:10px;font:inherit;font-size:9px;
+ font-weight:700;color:var(--txt2);background:#EDEAE4;border:0;border-radius:5px;
+ padding:2px 7px;cursor:pointer}
+.op.mex .op-mex{display:block}
+.op.mex{border-color:var(--ok)}
+.op.mex .op-kw,.op.mex .op-sem{display:none}
+.op-mex:hover{background:#DFD9E0;color:var(--txt)}
 
 
 .sl-box{width:var(--W);border:2.6px dashed #B4ADB7;border-radius:18px;background:#FBFAFB;
@@ -340,22 +344,113 @@ addEventListener('resize',todosOsFios); addEventListener('load',todosOsFios);
 (function(){
  var API='__API__', PERFIL='__PERFIL__';
 
- /* ── escolher a ideia ──────────────────────────────────────────────── */
- var ESC='lan-escolha';
- function lerE(){try{return JSON.parse(localStorage.getItem(ESC))||{}}catch(e){return {}}}
- function pintaE(){var d=lerE();document.querySelectorAll('.op').forEach(function(o){
-   o.classList.toggle('on',d[o.dataset.mo]===o.dataset.op);});}
- document.addEventListener('click',function(ev){var u=ev.target.closest('.op-use');if(!u)return;
-   var d=lerE();d[u.dataset.mo]=u.dataset.op;
-   try{localStorage.setItem(ESC,JSON.stringify(d))}catch(e){}
-   pintaE();});
+ /* ══ ESCREVER NO CARTÃO ════════════════════════════════════════════════
+    Clica em qualquer parte do cartão e escreve: o ângulo, a palavra e a copy.
+    Enter salva · Shift+Enter quebra linha · Esc desfaz o que estava editando.
 
- /* copiar: o texto vai sem tag — <b> e <br> viram negrito e quebra de verdade */
+    ⚠️ Enter SALVA, então Enter não pode quebrar linha — por isso Shift+Enter.
+       Sem essa troca, escrever um parágrafo novo fecharia a edição no meio.
+    ⚠️ O original de cada copy fica guardado em `data-org` no próprio HTML,
+       nunca no localStorage: assim o ↺ funciona mesmo depois de limpar o
+       navegador, e um texto novo do gerador não fica preso atrás do salvo. */
+ var EDI='lan-copies';
+ function lerC(){try{return JSON.parse(localStorage.getItem(EDI))||{}}catch(e){return {}}}
+ function gravaC(d){try{localStorage.setItem(EDI,JSON.stringify(d))}catch(e){}}
+ function chave(c){return c.dataset.mo+'-'+c.dataset.op;}
+ function partes(c){return {an:c.querySelector('.op-an'),
+   kw:c.querySelector('.op-kw')||c.querySelector('.op-sem'),
+   tx:c.querySelector('.op-tx')};}
+
+ /* guarda o original antes de qualquer edição, e aplica o que já foi salvo */
+ function prepara(){
+   var d=lerC();
+   document.querySelectorAll('.op').forEach(function(c){
+     var p=partes(c);
+     if(!c.dataset.org){
+       c.dataset.org=JSON.stringify({an:p.an.textContent,
+         kw:p.kw?p.kw.textContent:'', sem:!!c.querySelector('.op-sem'),
+         tx:p.tx.innerHTML});}
+     var g=d[chave(c)];
+     if(g){aplica(c,g); c.classList.add('mex');}
+   });}
+ /* palavra escrita vira selo amarelo; apagada volta a ser post de alcance */
+ function pintaKw(el){
+   if(!el)return;
+   var t=el.textContent.trim();
+   var vazio = !t || t.indexOf('alcance')===0;
+   el.className = vazio ? 'op-sem' : 'op-kw';
+   if(vazio && !t) el.textContent='alcance · sem palavra';}
+ function aplica(c,g){
+   var p=partes(c);
+   if(g.an!=null) p.an.textContent=g.an;
+   if(p.kw&&g.kw!=null){p.kw.textContent=g.kw; pintaKw(p.kw);}
+   if(g.tx!=null) p.tx.innerHTML=g.tx;}
+
+ function editavel(c,liga){
+   var p=partes(c);
+   [p.an,p.kw,p.tx].forEach(function(e){if(e)e.contentEditable=liga?'true':'false';});
+   c.classList.toggle('ed',liga);}
+
+ function salva(c){
+   var p=partes(c), d=lerC(), org=JSON.parse(c.dataset.org);
+   var novo={an:p.an.textContent.trim(),
+     kw:p.kw?p.kw.textContent.trim():'',
+     tx:p.tx.innerHTML};
+   var mudou = novo.an!==org.an || novo.tx!==org.tx ||
+     (p.kw && novo.kw!==org.kw);
+   if(mudou){d[chave(c)]=novo; c.classList.add('mex');}
+   else {delete d[chave(c)]; c.classList.remove('mex');}
+   gravaC(d);
+   pintaKw(p.kw);          /* ⚠️ sem isto a palavra nova fica com selo de alcance */
+   editavel(c,false);
+   todosOsFios();          /* o cartão mudou de altura: os fios se refazem */
+   return mudou;}
+
+ function cancela(c){
+   var g=lerC()[chave(c)] || JSON.parse(c.dataset.org);
+   aplica(c,{an:g.an,kw:g.kw,tx:g.tx});
+   editavel(c,false); todosOsFios();}
+
+ /* clicar no cartão abre a edição com o cursor onde ela clicou */
+ document.addEventListener('mousedown',function(ev){
+   var c=ev.target.closest('.op');
+   document.querySelectorAll('.op.ed').forEach(function(o){if(o!==c)salva(o);});
+   if(!c||ev.target.closest('.op-mex')) return;
+   if(c.classList.contains('ed')) return;
+   editavel(c,true);
+   var al=ev.target.closest('.op-an,.op-kw,.op-sem,.op-tx')||partes(c).tx;
+   setTimeout(function(){
+     al.focus();
+     if(al.classList.contains('op-kw')||al.classList.contains('op-sem')){
+       /* a palavra é curta: seleciona tudo pra ela digitar por cima */
+       var r=document.createRange(); r.selectNodeContents(al);
+       var sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); return;}
+     var r=document.caretRangeFromPoint?
+       document.caretRangeFromPoint(ev.clientX,ev.clientY):null;
+     if(r){var sel=getSelection(); sel.removeAllRanges(); sel.addRange(r);}
+   },0);});
+
+ document.addEventListener('keydown',function(ev){
+   var c=ev.target.closest&&ev.target.closest('.op.ed'); if(!c)return;
+   if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault(); salva(c);
+     if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();}
+   else if(ev.key==='Escape'){ev.preventDefault(); cancela(c);}});
+
+ /* sair do cartão sem apertar nada também salva — ninguém perde texto */
+ document.addEventListener('focusout',function(ev){
+   var c=ev.target.closest&&ev.target.closest('.op.ed'); if(!c)return;
+   setTimeout(function(){
+     if(c.classList.contains('ed')&&!c.contains(document.activeElement)) salva(c);},0);});
+
+ /* ↺ volta ao texto que o gerador escreveu */
  document.addEventListener('click',function(ev){
-   var c=ev.target.closest('.op-cp'); if(!c)return;
-   var tx=c.closest('.op').querySelector('.op-tx');
-   try{navigator.clipboard.writeText(tx.innerText);c.textContent='copiada ✔';
-     setTimeout(function(){c.textContent='copiar'},1300);}catch(e){}});
+   var b=ev.target.closest('.op-mex'); if(!b)return;
+   var c=b.closest('.op'), d=lerC();
+   delete d[chave(c)]; gravaC(d);
+   var org=JSON.parse(c.dataset.org);
+   aplica(c,org);
+   if(org.sem){var p=partes(c); if(p.kw){p.kw.className='op-sem';}}
+   c.classList.remove('mex'); editavel(c,false); todosOsFios();});
 
  /* ══ O CARD DE AGENDAMENTO ════════════════════════════════════════════ */
  var vu=document.getElementById('vu'), ALVO=null, ARQ=null, TIPO='feed';
@@ -503,7 +598,7 @@ addEventListener('resize',todosOsFios); addEventListener('load',todosOsFios);
  }).catch(function(){
    document.getElementById('sinal').innerHTML='<span class="des">sem conexão com o servidor</span>';});
 
- pintaE(); pintaA();
+ prepara(); pintaA();
  requestAnimationFrame(todosOsFios); setTimeout(todosOsFios,340);
 })();
 """.replace('__API__', API).replace('__PERFIL__', PERFIL)
