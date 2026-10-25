@@ -48,7 +48,7 @@ def bloco(h):
 
 CSS = """
 :root{--bg:#0D0D10;--sup:#16161B;--txt:#F6F3F8;--txt2:#9C94A3;--linha:#282831;
- --f:-apple-system,'SF Pro Text','Helvetica Neue',Arial,sans-serif}
+ --f:-apple-system,BlinkMacSystemFont,system-ui,'SF Pro Text','Helvetica Neue',Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:var(--f);line-height:1.55;
  -webkit-font-smoothing:antialiased}

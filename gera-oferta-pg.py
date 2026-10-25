@@ -27,7 +27,7 @@ eni = ''.join(
 
 CSS = """
 :root{--bg:#0E0E11;--sup:#17171C;--txt:#F5F2F7;--txt2:#A29AA8;--linha:#2A2A32;
- --rosa:#FF2D87;--marca:#FFE27A;--f:-apple-system,'SF Pro Text','Helvetica Neue',Arial,sans-serif}
+ --rosa:#FF2D87;--marca:#FFE27A;--f:-apple-system,BlinkMacSystemFont,system-ui,'SF Pro Text','Helvetica Neue',Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:var(--f);line-height:1.55;
  -webkit-font-smoothing:antialiased}

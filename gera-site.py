@@ -150,8 +150,14 @@ CSS = """
 :root{--bg:#F4F4F6;--sup:#FFF;--txt:#1A0A12;--txt2:#7B6B74;--linha:#E4DFE4;
  --rosa:#FF2D87;--marca:#FFE27A;--ok:#1F7A4C;--fio:#C2BBC4;--azul:#0A84FF;
  --W:190px;--gapX:92px;
- --f:-apple-system,'SF Pro Text','Helvetica Neue','Inter',Arial,sans-serif}
+/* ⚠️ BlinkMacSystemFont é quem entrega a fonte da Apple NO CHROME — o
+   `-apple-system` sozinho é ignorado por ele e cai em Helvetica Neue.
+   Medido em 25/10: a mesma frase a 40px dava 986,53px (Helvetica) com a
+   pilha antiga e 926,56px (system-ui) com esta. */
+ --f:-apple-system,BlinkMacSystemFont,system-ui,'SF Pro Text','Helvetica Neue',Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
+/* campo de formulário não herda fonte por padrão — sem isto o input cai em Arial */
+input,textarea,select,button{font-family:inherit}
 body{background:var(--bg);color:var(--txt);font-family:var(--f);line-height:1.5;
  -webkit-font-smoothing:antialiased}
 .topo{position:sticky;top:0;z-index:80;background:rgba(244,244,246,.95);
@@ -239,9 +245,9 @@ svg.fios{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 /* ══ o cartão é folha de escrever: clica e edita, Enter salva ══════════ */
 .op{cursor:text}
 .op:hover{border-color:#CFC8D0}
-.op.ed{border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,122,255,.13);cursor:auto}
+.op.ed{border-color:var(--txt);cursor:auto}
 .op [contenteditable]{outline:none}
-.op [contenteditable]:focus{background:rgba(0,122,255,.05);border-radius:5px}
+.op [contenteditable]:focus{background:transparent}
 .op-dica{display:none;font-size:9px;color:var(--txt2);margin-top:8px;letter-spacing:.2px}
 .op.ed .op-dica{display:block}
 .op-mex{display:none;position:absolute;top:9px;right:10px;font:inherit;font-size:9px;
