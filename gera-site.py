@@ -93,10 +93,14 @@ def bloco(p, idx_na_cat):
         f'<div class="op" data-no="op-{sid}-{j}" data-mo="{sid}" data-op="{j}">'
         f'<div class="op-l1"><span class="op-n">{j}</span>'
         f'<span class="op-an">{esc(ang)}</span>'
-        + (f'<span class="op-kw">{esc(kw)}</span>' if kw else '')
-        + f'</div><div class="op-pe">'
+        + (f'<span class="op-kw">{esc(kw)}</span>' if kw
+           else '<span class="op-sem">alcance · sem palavra</span>')
+        + f'</div><div class="op-tx"><p>'
+        + txt.replace('<br><br>', '</p><p>')
+        + f'</p></div>'
+        f'<div class="op-pe">'
         f'<button class="op-use" data-mo="{sid}" data-op="{j}">usar esta</button>'
-        f'<button class="op-ver" data-mo="{sid}" data-op="{j}">ler a copy</button>'
+        f'<button class="op-cp" data-op-txt="{j}" data-mo="{sid}">copiar</button>'
         f'</div></div>'
         for j, (ang, kw, txt) in enumerate(p['copies'], 1))
     kw = (f'<span class="rf-kw">pede «{esc(p["pedido"])}»</span>'
@@ -211,20 +215,32 @@ svg.fios{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .rf-cm{display:block;font-size:10.5px;color:var(--txt2);margin-top:4px}
 .rf-leg{font-size:11px;color:var(--txt2);margin-top:4px}
 
-.opz{display:flex;flex-direction:column;gap:12px;width:248px}
-.op{background:var(--sup);border:1.6px solid var(--linha);border-radius:12px;padding:10px 11px}
+.opz{display:flex;flex-direction:column;gap:13px;width:372px}
+.op{background:var(--sup);border:1.6px solid var(--linha);border-radius:13px;padding:11px 13px}
 .op.on{border-color:var(--ok);box-shadow:0 0 0 2px rgba(31,122,76,.15)}
 .op-l1{display:flex;align-items:flex-start;gap:7px}
 .op-n{font-size:10px;font-weight:800;color:#fff;background:var(--txt);border-radius:5px;
  padding:1px 6px;flex:none;margin-top:1px}
-.op-an{font-size:12px;font-weight:700;line-height:1.3}
-.op-kw{font-size:9.5px;font-weight:800;background:var(--marca);border-radius:5px;
- padding:2px 7px;margin-left:auto}
-/* ⚠️ a copy inteira NÃO mora no cartão. Medido: com o texto dentro, 95 das 153
-   copies ficavam cortadas numa caixa com rolagem, o cartão ia a 200px e a
-   ramificação 1,3,1 perdia o alinhamento com a referência e o slot. A copy
-   abre na gaveta. */
-.op-pe{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.op-an{font-size:11.5px;font-weight:800;line-height:1.3;letter-spacing:-.01em}
+.op-kw{font-size:9px;font-weight:800;background:var(--marca);border-radius:5px;
+ padding:2px 7px;margin-left:auto;flex:none;white-space:nowrap}
+/* post de alcance puro: diz que não pede nada, pra não parecer esquecimento */
+.op-sem{font-size:9px;font-weight:700;color:var(--txt2);background:#EDEAE4;border-radius:5px;
+ padding:2px 7px;margin-left:auto;flex:none;white-space:nowrap}
+/* ⚠️ A copy fica ABERTA no fluxo — ela não quer clicar pra ler.
+   O que mantém o cartão pequeno é a LARGURA, não o corte: a 62 caracteres por
+   linha a copy mediana (251 car) cabe em 5 linhas. Nada de max-height com
+   rolagem: texto cortado dentro do cartão foi exatamente o defeito anterior. */
+.op-tx{font-size:10.5px;line-height:1.46;color:var(--txt2);margin-top:6px;
+ overflow-wrap:break-word}
+.op-tx p{margin:0}
+.op-tx p+p{margin-top:5px}
+.op-tx b{color:var(--txt);font-weight:700}
+.op-tx i{color:var(--txt2);font-style:italic;opacity:.85}
+.op-pe{display:flex;gap:6px;margin-top:8px}
+.op-pe button{font:inherit;font-size:9.5px;font-weight:700;padding:2px 8px;cursor:pointer;
+ border:1.3px solid var(--linha);border-radius:6px;background:transparent;color:var(--txt2)}
+.op-pe button:hover{border-color:var(--txt2)}
 .op-pe button{font:inherit;font-size:10.5px;font-weight:700;padding:4px 10px;cursor:pointer;
  border:1.5px solid var(--linha);border-radius:7px;background:transparent;color:var(--txt2)}
 .op-use{font:inherit;font-size:10.5px;font-weight:700;padding:4px 10px;margin-top:8px;
@@ -232,36 +248,6 @@ svg.fios{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
  color:var(--txt2)}
 .op.on .op-use{background:var(--ok);color:#fff;border-color:var(--ok)}
 
-/* ══ a gaveta da copy ══════════════════════════════════════════════ */
-.gv-fundo{position:fixed;inset:0;background:rgba(20,16,22,.42);opacity:0;pointer-events:none;
- transition:opacity .18s;z-index:120}
-.gv-fundo.on{opacity:1;pointer-events:auto}
-.gv{position:fixed;top:0;right:0;height:100%;width:min(430px,92vw);background:var(--sup);
- border-left:1px solid var(--linha);box-shadow:-18px 0 44px -22px rgba(0,0,0,.4);
- transform:translateX(102%);transition:transform .22s cubic-bezier(.3,.8,.4,1);z-index:121;
- display:flex;flex-direction:column}
-.gv.on{transform:none}
-.gv-cab{padding:17px 20px 13px;border-bottom:1px solid var(--linha);flex:none}
-.gv-l1{display:flex;align-items:center;gap:9px}
-.gv-n{font-size:10px;font-weight:800;color:#fff;background:var(--txt);border-radius:5px;padding:1px 6px}
-.gv-dt{font-size:11px;font-weight:700;color:var(--txt2)}
-.gv-x{margin-left:auto;font:inherit;font-size:19px;line-height:1;cursor:pointer;border:0;
- background:transparent;color:var(--txt2);padding:2px 5px}
-.gv-an{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-top:9px;line-height:1.25}
-.gv-kw{display:inline-block;font-size:10px;font-weight:800;background:var(--marca);
- border-radius:5px;padding:2px 8px;margin-top:8px}
-.gv-kw0{background:#EDEAE4;color:#6B6258}
-.gv-tx{flex:1;overflow:auto;padding:17px 20px;font-size:14.5px;line-height:1.62;
- white-space:pre-line}
-.gv-tx b{font-weight:800}
-.gv-tx i{color:var(--rosa);font-style:normal;font-weight:700}
-.gv-pe{flex:none;padding:13px 20px;border-top:1px solid var(--linha);display:flex;gap:8px}
-.gv-pe button{font:inherit;font-size:12.5px;font-weight:700;padding:9px 15px;cursor:pointer;
- border-radius:9px;border:1.5px solid var(--linha);background:transparent;color:var(--txt)}
-.gv-cp{background:var(--txt)!important;color:var(--bg)!important;border-color:var(--txt)!important}
-.gv-us{background:var(--ok)!important;color:#fff!important;border-color:var(--ok)!important}
-.gv-nav{display:flex;gap:6px;margin-left:auto}
-.gv-nav button{padding:9px 12px}
 
 .sl-box{width:var(--W);border:2.6px dashed #B4ADB7;border-radius:18px;background:#FBFAFB;
  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -323,8 +309,10 @@ svg.fios{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
 .cd-av{font-size:11.5px;color:var(--txt2);text-align:center;padding:0 22px 8px;line-height:1.45}
 .cd-er{font-size:12.5px;color:#A3104A;font-weight:600;text-align:center;padding:0 22px 8px}
 
-@media(max-width:1500px){:root{--gapX:76px;--W:178px}.opz{width:214px}.mo{margin-right:54px}}
-@media(max-width:1250px){:root{--gapX:58px;--W:162px}.opz{width:198px}.mo{margin-right:44px}}
+@media(max-width:1500px){:root{--gapX:64px;--W:172px}.opz{width:340px}.mo{margin-right:44px}}
+@media(max-width:1250px){:root{--gapX:44px;--W:150px}.opz{width:300px}.mo{margin-right:30px}}
+@media(max-width:1040px){:root{--gapX:30px;--W:124px}.opz{width:260px}.mo{margin-right:16px}
+ .op-tx{font-size:10px}}
 """
 
 JS = r"""
@@ -362,49 +350,12 @@ addEventListener('resize',todosOsFios); addEventListener('load',todosOsFios);
    try{localStorage.setItem(ESC,JSON.stringify(d))}catch(e){}
    pintaE();});
 
- /* ══ A GAVETA DA COPY ═════════════════════════════════════════════════
-    As 153 copies moram no CP (ver o <script> dos dados), não no HTML dos
-    cartões — assim a ramificação 1,3,1 fica com os cartões pequenos e
-    alinhados, e a copy aparece inteira, sem rolagem dentro do cartão. */
- var gv=document.getElementById('gv'), gvf=document.getElementById('gv-fundo'), GV=null;
- var gel={n:document.getElementById('gv-n'),dt:document.getElementById('gv-dt'),
-   an:document.getElementById('gv-an'),kw:document.getElementById('gv-kw'),
-   tx:document.getElementById('gv-tx'),us:document.getElementById('gv-us'),
-   cp:document.getElementById('gv-cp')};
- function abreGV(mo,op){
-   var c=(CP[mo]||[])[op-1]; if(!c)return;
-   GV={mo:mo,op:op};
-   gel.n.textContent=op+'/3';
-   gel.dt.textContent=(CPD[mo]||'');
-   gel.an.textContent=c[0];
-   if(c[1]){gel.kw.textContent='palavra: '+c[1];gel.kw.className='gv-kw';}
-   else{gel.kw.textContent='sem palavra — post de alcance';gel.kw.className='gv-kw gv-kw0';}
-   gel.tx.innerHTML=c[2];
-   gel.us.textContent=(lerE()[mo]===String(op))?'escolhida ✔':'usar esta';
-   gv.classList.add('on'); gvf.classList.add('on');}
- function fechaGV(){gv.classList.remove('on');gvf.classList.remove('on');GV=null;}
+ /* copiar: o texto vai sem tag — <b> e <br> viram negrito e quebra de verdade */
  document.addEventListener('click',function(ev){
-   var v=ev.target.closest('.op-ver'); if(!v)return;
-   abreGV(v.dataset.mo, +v.dataset.op);});
- gvf.addEventListener('click',fechaGV);
- document.getElementById('gv-x').addEventListener('click',fechaGV);
- addEventListener('keydown',function(e){if(e.key==='Escape'&&GV)fechaGV();});
- /* ← → anda entre as 3 opções do mesmo post, sem fechar a gaveta */
- document.getElementById('gv-ant').addEventListener('click',function(){
-   if(GV)abreGV(GV.mo, GV.op===1?3:GV.op-1);});
- document.getElementById('gv-pro').addEventListener('click',function(){
-   if(GV)abreGV(GV.mo, GV.op===3?1:GV.op+1);});
- gel.us.addEventListener('click',function(){
-   if(!GV)return; var d=lerE(); d[GV.mo]=String(GV.op);
-   try{localStorage.setItem(ESC,JSON.stringify(d))}catch(e){}
-   pintaE(); gel.us.textContent='escolhida ✔';});
- gel.cp.addEventListener('click',function(){
-   if(!GV)return;
-   /* ⚠️ o texto vai pro clipboard SEM tag: <b> e <br> viram negrito e quebra
-      de linha de verdade, não os caracteres literais */
-   var t=gel.tx.innerText;
-   try{navigator.clipboard.writeText(t);gel.cp.textContent='copiada ✔';
-     setTimeout(function(){gel.cp.textContent='copiar a copy'},1400);}catch(e){}});
+   var c=ev.target.closest('.op-cp'); if(!c)return;
+   var tx=c.closest('.op').querySelector('.op-tx');
+   try{navigator.clipboard.writeText(tx.innerText);c.textContent='copiada ✔';
+     setTimeout(function(){c.textContent='copiar'},1300);}catch(e){}});
 
  /* ══ O CARD DE AGENDAMENTO ════════════════════════════════════════════ */
  var vu=document.getElementById('vu'), ALVO=null, ARQ=null, TIPO='feed';
@@ -586,29 +537,7 @@ CARD = f"""
  </div></div>"""
 
 n_pede = sum(1 for p in POSTS if p['pede'])
-GAVETA = """
-<div class="gv-fundo" id="gv-fundo"></div>
-<aside class="gv" id="gv" aria-label="a copy inteira">
- <div class="gv-cab">
-  <div class="gv-l1"><span class="gv-n" id="gv-n">1/3</span>
-   <span class="gv-dt" id="gv-dt"></span>
-   <button class="gv-x" id="gv-x" title="fechar">&times;</button></div>
-  <div class="gv-an" id="gv-an"></div>
-  <span class="gv-kw" id="gv-kw"></span>
- </div>
- <div class="gv-tx" id="gv-tx"></div>
- <div class="gv-pe">
-  <button class="gv-cp" id="gv-cp">copiar a copy</button>
-  <button class="gv-us" id="gv-us">usar esta</button>
-  <span class="gv-nav"><button id="gv-ant">&larr;</button><button id="gv-pro">&rarr;</button></span>
- </div>
-</aside>"""
 
-# as 153 copies e a data de cada post — fora do HTML dos cartões
-DADOS = ('<script>var CP=' + json.dumps({p['sid']: p['copies'] for p in POSTS},
-         ensure_ascii=False) + ';var CPD=' +
-         json.dumps({p['sid']: p['quando'][8:10] + '/' + p['quando'][5:7] for p in POSTS},
-                    ensure_ascii=False) + ';</script>')
 
 
 HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
@@ -637,8 +566,6 @@ HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
   nascer ligadas a um funil que mede.</p>
 </div>
 {CARD}
-{GAVETA}
-{DADOS}
 <script>{JS}</script></body></html>"""
 
 assert _vistos == len(POSTS), f'{len(POSTS) - _vistos} posts ficaram de fora das categorias'
